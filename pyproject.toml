@@ -1,5 +1,5 @@
 [project]
-name = "pubmed"
+name = "pubmed-extension"
 version = "0.1.0"
 description = ""
 authors = [
