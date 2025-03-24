@@ -20,7 +20,13 @@ A command-line tool to **fetch and analyze papers from PubMed** using advanced q
 
 ## Installation
 
-### 1. Clone the Repository
+### Option 1: Install from TestPyPI
+
+```bash
+pip install -i https://test.pypi.org/simple/ pubmed-extension
+```
+
+### Option 2: Install from Source
 
 ```bash
 git clone https://github.com/username/pubmed-paper-fetcher.git
@@ -28,7 +34,7 @@ cd pubmed-paper-fetcher
 poetry install
 ```
 
-### 2. Run
+## Usage
 
 ```bash
 poetry run get-papers-list "cancer AND (biotech[ad] OR pharma[ad])" --max 1 --debug --file papers.csv
