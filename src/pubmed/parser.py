@@ -48,16 +48,33 @@ def parse_article(article: Dict[str, Any]) -> Dict[str, Any]:
                     company_affiliations.add(affil_text)
                     non_academic_authors.append(str(author.get("LastName", "")))
 
+        # Exclude papers that only have academic affiliations
+        if not company_affiliations:
+            logger.debug(
+                "Excluding article with PMID %s due to only academic affiliations.",
+                medline["PMID"],
+            )
+            return None
+
         journal_info: Dict[str, Any] = article_data["Journal"]["JournalIssue"]
-        emails = set()
+        emails_by_author: Dict[str, str] = {}
         for author in article_data.get("AuthorList", []):
+            author_name = str(author.get("LastName", ""))
             for aff_info in author.get("AffiliationInfo", []):
                 aff_text = aff_info.get("Affiliation", "")
                 if "@" in aff_text and "." in aff_text:
                     found_emails = re.findall(
                         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", aff_text
                     )
-                    emails.update(found_emails)
+                    if found_emails:
+                        # If the same author appears in multiple affiliations, join emails
+                        if author_name in emails_by_author:
+                            # Append additional emails (ensure uniqueness if needed)
+                            existing = set(emails_by_author[author_name].split(";"))
+                            updated = existing.union(found_emails)
+                            emails_by_author[author_name] = ";".join(updated)
+                        else:
+                            emails_by_author[author_name] = ";".join(found_emails)
 
         parsed_data = {
             "PubmedID": str(medline["PMID"]),
@@ -65,7 +82,7 @@ def parse_article(article: Dict[str, Any]) -> Dict[str, Any]:
             "Publication Date": journal_info["PubDate"],
             "Non-academic Author(s)": ";".join(non_academic_authors),
             "Company Affiliation(s)": ";".join(company_affiliations),
-            "Corresponding Author Email": str(emails),
+            "Corresponding Author Email": str(emails_by_author),
         }
 
         logger.debug(

@@ -45,7 +45,15 @@ def main() -> None:
         logger.info("Successfully retrieved %d records", len(records))
 
         logger.debug("Parsing article metadata")
-        df: pd.DataFrame = pd.DataFrame([parse_article(r) for r in records])
+
+        # Skip records with only academic affiliations
+        df = pd.DataFrame(
+            [
+                result
+                for record in records
+                if (result := parse_article(record)) is not None
+            ]
+        )
 
         if args.file:
             logger.info("Writing output to %s", args.file)
