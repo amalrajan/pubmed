@@ -1,6 +1,6 @@
 [project]
 name = "pubmed-extension"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 authors = [
     {name = "Amal Rajan",email = "amalrajan.in@gmail.com"}
@@ -8,8 +8,8 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "pandas (>=2.2.3,<3.0.0)",
-    "biopython (>=1.85,<2.0)"
+    "pandas>=2.2.3,<3.0.0",
+    "biopython>=1.85,<2.0"
 ]
 
 [tool.poetry]
@@ -19,6 +19,16 @@ packages = [{include = "pubmed", from = "src"}]
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
 responses = "^0.25.7"
+
+[[tool.poetry.source]]
+name = "pypi"
+priority = "primary"
+
+[[tool.poetry.source]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+priority = "supplemental"
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

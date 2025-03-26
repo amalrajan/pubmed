@@ -37,5 +37,5 @@ poetry install
 ## Usage
 
 ```bash
-poetry run get-papers-list "cancer AND (biotech[ad] OR pharma[ad])" --max 1 --debug --file papers.csv
+poetry run get-papers-list "cancer AND (biotech[ad] OR pharma[ad])" --debug --file papers.csv
 ```

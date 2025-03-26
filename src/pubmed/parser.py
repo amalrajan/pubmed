@@ -1,3 +1,4 @@
+import re
 from typing import Any, Dict, List, Set
 
 from pubmed.utils.logger import get_logger
@@ -48,28 +49,39 @@ def parse_article(article: Dict[str, Any]) -> Dict[str, Any]:
                     non_academic_authors.append(str(author.get("LastName", "")))
 
         journal_info: Dict[str, Any] = article_data["Journal"]["JournalIssue"]
+        emails = set()
+        for author in article_data.get("AuthorList", []):
+            for aff_info in author.get("AffiliationInfo", []):
+                aff_text = aff_info.get("Affiliation", "")
+                if "@" in aff_text and "." in aff_text:
+                    found_emails = re.findall(
+                        r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b", aff_text
+                    )
+                    emails.update(found_emails)
 
         parsed_data = {
-            "pmid": str(medline["PMID"]),
-            "title": str(article_data["ArticleTitle"]),
-            "date": journal_info["PubDate"],
-            "non_academic_authors": ";".join(non_academic_authors),
-            "company_affiliations": ";".join(company_affiliations),
-            "corresp_email": str(article_data.get("ELocationID", "")),
+            "PubmedID": str(medline["PMID"]),
+            "Title": str(article_data["ArticleTitle"]),
+            "Publication Date": journal_info["PubDate"],
+            "Non-academic Author(s)": ";".join(non_academic_authors),
+            "Company Affiliation(s)": ";".join(company_affiliations),
+            "Corresponding Author Email": str(emails),
         }
 
-        logger.debug("Successfully parsed article with PMID: %s", parsed_data["pmid"])
+        logger.debug(
+            "Successfully parsed article with PMID: %s", parsed_data["PubmedID"]
+        )
         return parsed_data
 
     except KeyError as e:
         logger.error("Missing key in article data: %s", str(e), exc_info=True)
         return {
-            "pmid": "N/A",
-            "title": "N/A",
-            "date": "N/A",
-            "non_academic_authors": "",
-            "company_affiliations": "",
-            "corresp_email": "",
+            "PubmedID": "N/A",
+            "Title": "N/A",
+            "Publication Date": "N/A",
+            "Non-academic Author(s)": "",
+            "Company Affiliation(s)": "",
+            "Corresponding Author Email": "",
         }
     except Exception as e:
         logger.critical("Error while parsing article: %s", str(e), exc_info=True)

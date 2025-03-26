@@ -13,7 +13,6 @@ class Args(argparse.Namespace):
     query: str
     file: Optional[str]
     debug: bool
-    max: int
 
 
 def main() -> None:
@@ -25,7 +24,7 @@ def main() -> None:
 
     Usage examples::
 
-        python pubmed_tool.py "cancer[title]" --max 500
+        python pubmed_tool.py "cancer[title]
         python pubmed_tool.py "machine learning[abstract]" -f output.csv
     """
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
@@ -36,14 +35,13 @@ def main() -> None:
     parser.add_argument("query", help="PubMed search query")
     parser.add_argument("-f", "--file", help="Output CSV filename")
     parser.add_argument("-d", "--debug", action="store_true")
-    parser.add_argument("--max", type=int, default=100, help="Maximum results to fetch")
 
     args: Args = parser.parse_args(namespace=Args())
     logger = get_logger(debug=args.debug)
 
     try:
         logger.debug("Initializing PubMed search with query: %s", args.query)
-        records: List[Dict[str, Any]] = fetch_pubmed_data(args.query, args.max)
+        records: List[Dict[str, Any]] = fetch_pubmed_data(args.query)
         logger.info("Successfully retrieved %d records", len(records))
 
         logger.debug("Parsing article metadata")
@@ -60,3 +58,6 @@ def main() -> None:
         logger.error("API Error: %s", str(e))
     except Exception as e:
         logger.critical("Unexpected error: %s", str(e), exc_info=args.debug)
+
+
+main()
