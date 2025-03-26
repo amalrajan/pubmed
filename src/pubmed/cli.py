@@ -66,6 +66,3 @@ def main() -> None:
         logger.error("API Error: %s", str(e))
     except Exception as e:
         logger.critical("Unexpected error: %s", str(e), exc_info=args.debug)
-
-
-main()
